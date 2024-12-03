@@ -1,7 +1,7 @@
 use regex::Regex;
 
 fn main() {
-    let mut INPUT_STRING: &str = include_str!("../input.txt"); // Pull in input file as string
+    const INPUT_STRING: &str = include_str!("../input.txt"); // Pull in input file as string
     let mut total_sum = 0;
 
     // Remove all text between don't() and do() or don't() and newline
