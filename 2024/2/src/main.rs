@@ -1,8 +1,9 @@
 fn main() {
-    calculate_total_unsafe_readings();
+    let (safe_readings, unsafe_readings) = calculate_total_unsafe_readings();
+    println!("Total unsafe readings: {}\nTotal safe readings: {}", unsafe_readings, safe_readings);
 }
 
-fn calculate_total_unsafe_readings(){
+fn calculate_total_unsafe_readings() -> (i32, i32) {
     const INPUT_STRING: &str = include_str!("../input.txt"); // Pull in input file as string
     let lines = INPUT_STRING.lines();
    
@@ -12,26 +13,47 @@ fn calculate_total_unsafe_readings(){
     });
     
     let mut unsafe_readings = 0;
+    let mut safe_readings = 0;
+    
     for readings in mapped_lines {
-        println!("Readings: {:?}", readings);
-        
-        // Check for all increasing or decreasing readings
-        // TODO
+        let mut diffs: Vec<i32> = vec![];
+        let mut is_unsafe = false;
         
         // Check for unsafe differences between readings
         for i in 0..readings.len() - 1 {
-            let first: i32 = readings[i];
-            let next: i32 = readings[i+1];
-            let diff: i32 = (first - next).abs(); // Calculate difference between readings
+            let diff: i32 = readings[i] - readings[i+1]; // Calculate difference between readings
             
-            println!("First: {}, Next: {}, Diff: {}", first, next, diff);
-            
-            if diff > 3 || diff == 0 {
-                unsafe_readings += 1;
+            if diff == 0 || diff > 3 || diff < -3 {
+                is_unsafe = true;
                 break;
             }
+            
+            diffs.push(diff);
+        }
+        
+        // Check for all increasing or decreasing readings
+        if is_unsafe == false {
+            let mut increasing = false;
+            let mut decreasing = false;
+            
+            for diff in diffs.clone() {
+                match diff < 0 {
+                    true => decreasing = true,
+                    false => increasing = true,
+                }
+                
+                if increasing == true && decreasing == true {
+                    is_unsafe = true;
+                    break;
+                }
+            }
+        }
+        
+        match is_unsafe {
+            true => unsafe_readings += 1,
+            false => safe_readings += 1
         }
     }
     
-    println!("Total unsafe readings: {}", unsafe_readings);
+    (unsafe_readings, safe_readings)
 }
